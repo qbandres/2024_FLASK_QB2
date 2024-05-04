@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Detalles del <head> aquí -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Importar las librerías de Bokeh -->
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.4.1.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.4.1.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-3.4.1.min.js"></script>
+</head>
+<body>
+
+    {% include 'management/header.html' %} 
+    <div class="flex-container">
+        <div class="flex-item">            
+            {{ script1 | safe }}
+            {{ div1 | safe }}
+        </div>
+        <div class="flex-item">
+            {{ script2 | safe }}
+            {{ div2 | safe }}
+        </div>
+        <div class="flex-item">
+            División 3
+        </div>
+    </div>
+    
+<!-- 
+    <iframe title="20240423_powerBi_ys" width="100%" height="800" src="https://app.powerbi.com/view?r=eyJrIjoiYTExZmNlMDEtY2NlNC00YTJiLTk5MjYtNWJkM2UwMGY5MjhlIiwidCI6ImE5YWE1ZjE4LWYyODEtNDY1NS1hYjU4LTg0Nzk2ZWIwOTc5ZCJ9" frameborder="0" allowFullScreen="true"></iframe> -->
+
+    {% include 'z_tools/search_elements.html' %}  <!-- Incluye estado_master.html según sea necesario -->
+
+    {% include 'management/footer.html' %} 
+
+</body>
+</html>
+

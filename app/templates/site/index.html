@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Detalles del <head> aquí -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    {%include 'site/header.html'%}
+
+    <!-- Contenido específico del administrador aquí -->
+
+    {% include 'z_tools/search_elements.html' %}  <!-- Incluye estado_master.html según sea necesario -->
+
+</body>
+</html>

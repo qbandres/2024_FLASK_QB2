@@ -1,0 +1,120 @@
+<head>
+  <style>
+
+  </style>
+</head>
+
+<div class="estado-master-content">
+  <section class="search-section">
+    <form action="{{ url_for('search_elements') }}" class="container" id="searchForm" method="post">
+
+      <h3>Busqueda de los elementos estructurales</h3>
+        
+        <input type="text" id="idFilter" name="id_filter" placeholder="ID">
+        <select id="espFilter" name="esp_filter">
+          <option value="">Selecciona un ESP</option>
+          <option value="03101.H030">03101.H030</option>
+          <option value="03101.H031">03101.H031</option>
+          <option value="03101.H032">03101.H032</option>
+          <option value="03101.H033">03101.H033</option>
+          <option value="03101.H108">03101.H108</option>
+          <option value="03101.H109">03101.H109</option>
+          <option value="03101.H110">03101.H110</option>
+          <option value="03101.H111">03101.H111</option>
+          <option value="03101.H112">03101.H112</option>
+          <option value="03101.H113">03101.H113</option>
+          <option value="03101.H114">03101.H114</option>
+          <option value="03101.H115">03101.H115</option>
+          <option value="03101.H116">03101.H116</option>
+          <option value="03101.H117">03101.H117</option>
+          <option value="03101.H118-1">03101.H118-1</option>
+          <option value="03101.H118-2">03101.H118-2</option>
+        </select>
+        
+        <select id="lineaFilter" name="linea_filter">
+          <option value="">Selecciona una Linea</option>
+          <option value="L1">L1</option>
+          <option value="L2">L2</option>
+        </select>
+        
+        <!-- Cambio realizado aquí para la descripción -->
+        <select id="classFilter" name="class_filter">
+          <option value="">Selecciona una descripción</option>
+          <option value="Extra Pesada">Extra Pesada</option>
+          <option value="Grating">Grating</option>
+          <option value="Handrail with Toe plate">Handrail with Toe plate</option>
+          <option value="Liviana">Liviana</option>
+          <option value="Mediana">Mediana</option>
+          <option value="Pesada">Pesada</option>
+          <option value="Platform Frameworks">Platform Frameworks</option>
+          <option value="Roofing Trusses">Roofing Trusses</option>
+          <option value="Stair Treads">Stair Treads</option>
+        </select>
+        
+        <input type="number" id="weightValue" name="weight_value" placeholder="Peso">
+        <select id="weightCondition" name="weight_condition">
+          <option value="greater">Mayor que</option>
+          <option value="less">Menor que</option>
+        </select>
+             
+        <p></p>
+        
+        <button class="btn" type="submit">Buscar</button>
+    </form>
+  </section>
+  
+  <section class="table-section">
+      <table>
+          <thead>
+            <tr>  
+              <th>ID</th>
+              <th>PIECEMARCK</th>
+              <th>BARCODE</th>
+              <th>ESP</th>
+              <th>PROFILE</th>
+              <th>LINEA</th>
+              <th>DESCRIPTION</th>
+              <th>CLASS</th>
+              <th>QUANTITY</th>
+              <th>WEIGHT</th>
+              <th>RATIO</th>
+              <th>TRASLADO</th>
+              <th>PRE_ENSAMBLE</th>
+              <th>MONTAJE</th>
+              <th>TORQUE</th>
+              <th>PUNCH</th>
+  
+              <!-- Añade más encabezados de columna según tus datos -->
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in filtered_data %}
+            <tr>
+              <td>{{ item.ID }}</td> <!-- ID -->
+              <td>{{ item.PIECEMARK }}</td> <!-- Warehouse -->
+              <td>{{ item.BARCODE }}</td> <!-- Description -->
+              <td>{{ item.ESP }}</td> <!-- Quantity -->
+              <td>{{ item.PROFILE }}</td> <!-- Weight -->
+              <td>{{ item.LINEA }}</td> <!-- Area -->
+              <td>{{ item.DESCRIPTION }}</td> <!-- Sector -->
+              <td>{{ item.CLASS }}</td> <!-- Type F -->
+              <td>{{ item.QUANTITY }}</td> <!-- Rate -->
+              <td>{{ item.WEIGHT }}</td> <!-- Reception Date -->
+              <td>{{ item.RATIO }}</td> <!-- Pre-Assembly Date -->
+              <td>{{ item.TRASLADO }}</td> <!-- Assembly Date -->
+              <td>{{ item.PRE_ENSAMBLE }}</td> <!-- Alignment Date -->
+              <td>{{ item.MONTAJE }}</td> <!-- Torque Date -->
+              <td>{{ item.TORQUE }}</td> <!-- Touch -->
+              <td>{{ item.PUNCH }}</td> <!-- Punch -->
+              <!-- Repite para cada columna adicional según sea necesario -->
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="16">No se encontraron resultados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        
+        </table>
+  </section>
+</div>
