@@ -2,7 +2,7 @@ from app import app
 from app.services.sql_processor import Consultas_sql
 from app.services.excel_processor import DataExcel
 from app.services.graphic_processor import BokehGraph
-from flask import request, session, redirect, url_for, flash,send_file
+from flask import request, session, redirect, url_for, flash,send_file, jsonify,render_template
 from sqlalchemy.exc import SQLAlchemyError
 from app.models.user import render_by_role
 
@@ -48,27 +48,52 @@ def search_elements():
 
     if 'username' not in session:
         return redirect(url_for('login'))
+    
+    if request.method == 'GET':
+        # Devuelve la página inicial para el formulario
+        return render_template('search_elements.html', filtered_data=filtered_data)
 
-    if request.method == 'POST':
-        try:
-            # Recupere los valores de los filtros del formulario
-            id_filter = request.form.get('id_filter')
-            esp_filter = request.form.get('esp_filter')
-            linea_filter = request.form.get('linea_filter')
-            class_filter = request.form.get('class_filter')
-            weight_condition = request.form.get('weight_condition')
-            weight_value = request.form.get('weight_value', type=float)  # Asegúrese de convertir a float
+    elif request.method == 'POST':
+            try:
+                # Recuperar los valores de los filtros del formulario
+                id_filter = request.form.get('id_filter')
+                esp_filter = request.form.get('esp_filter')
+                linea_filter = request.form.get('linea_filter')
+                class_filter = request.form.get('class_filter')
+                weight_condition = request.form.get('weight_condition')
+                weight_value = request.form.get('weight_value', type=float)
 
-            ConsultaSql = Consultas_sql()
-            #Llamar al método filter_sql con los parámetros adecuados
-            filtered_data = ConsultaSql.filter_sql(None, id_filter, esp_filter, linea_filter, class_filter, weight_condition, weight_value)
+                # Crear un objeto de consulta y realizar el filtrado
+                ConsultaSql = Consultas_sql()
+                filtered_data = ConsultaSql.filter_sql(
+                    None, id_filter, esp_filter, linea_filter, class_filter, weight_condition, weight_value
+                )
 
-        except SQLAlchemyError as e:
-            flash(f"Ocurrió un error al procesar la búsqueda: {e}", 'error')
-            app.logger.error(f"Error en /search_elements: {e}")
-        except ValueError as e:
-            flash(f"Error en el formato del ID: {e}", 'error')
+            except SQLAlchemyError as e:
+                return jsonify({'error': f"Ocurrió un error al procesar la búsqueda: {e}"}), 500
+            except ValueError as e:
+                return jsonify({'error': f"Error en el formato del ID: {e}"}), 400
+            
+            # Convierte los resultados en formato JSON para AJAX
+            resultado = [
+                {
+                    'ID': item.ID,
+                    'PIECEMARK': item.PIECEMARK,
+                    'BARCODE': item.BARCODE,
+                    'ESP': item.ESP,
+                    'PROFILE': item.PROFILE,
+                    'LINEA': item.LINEA,
+                    'DESCRIPTION': item.DESCRIPTION,
+                    'CLASS': item.CLASS,
+                    'QUANTITY': item.QUANTITY,
+                    'WEIGHT': item.WEIGHT,
+                    'RATIO': item.RATIO,
+                    'TRASLADO': str(item.TRASLADO),
+                    'PRE_ENSAMBLE': str(item.PRE_ENSAMBLE),
+                    'MONTAJE': str(item.MONTAJE),
+                    'TORQUE': str(item.TORQUE),
+                    'PUNCH': str(item.PUNCH)
+                } for item in filtered_data
+            ]
 
-    # Usa la función `render_by_role` para devolver la plantilla según el rol
-    context = {'filtered_data': filtered_data}
-    return render_by_role('index', context)
+            return jsonify({'data': resultado})

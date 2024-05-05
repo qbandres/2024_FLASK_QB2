@@ -1,15 +1,18 @@
+<!DOCTYPE html>
+<html lang="es">
 <head>
+  <title>Búsqueda de Elementos Estructurales</title>
   <style>
-
+    /* Aquí puedes agregar tus estilos personalizados */
   </style>
 </head>
+<body>
+  <div class="estado-master-content">
+    <!-- Sección del formulario para la búsqueda -->
+    <section class="search-section">
+      <form class="container" id="searchForm">
+        <h3>Búsqueda de los elementos estructurales</h3>
 
-<div class="estado-master-content">
-  <section class="search-section">
-    <form action="{{ url_for('search_elements') }}" class="container" id="searchForm" method="post">
-
-      <h3>Busqueda de los elementos estructurales</h3>
-        
         <input type="text" id="idFilter" name="id_filter" placeholder="ID">
         <select id="espFilter" name="esp_filter">
           <option value="">Selecciona un ESP</option>
@@ -30,14 +33,13 @@
           <option value="03101.H118-1">03101.H118-1</option>
           <option value="03101.H118-2">03101.H118-2</option>
         </select>
-        
+
         <select id="lineaFilter" name="linea_filter">
-          <option value="">Selecciona una Linea</option>
+          <option value="">Selecciona una Línea</option>
           <option value="L1">L1</option>
           <option value="L2">L2</option>
         </select>
-        
-        <!-- Cambio realizado aquí para la descripción -->
+
         <select id="classFilter" name="class_filter">
           <option value="">Selecciona una descripción</option>
           <option value="Extra Pesada">Extra Pesada</option>
@@ -50,71 +52,105 @@
           <option value="Roofing Trusses">Roofing Trusses</option>
           <option value="Stair Treads">Stair Treads</option>
         </select>
-        
+
         <input type="number" id="weightValue" name="weight_value" placeholder="Peso">
         <select id="weightCondition" name="weight_condition">
           <option value="greater">Mayor que</option>
           <option value="less">Menor que</option>
         </select>
-             
+
         <p></p>
-        
-        <button class="btn" type="submit">Buscar</button>
-    </form>
-  </section>
-  
-  <section class="table-section">
+        <button class="btn" type="button" onclick="buscarElementos()">Buscar</button>
+      </form>
+    </section>
+
+    <!-- Sección de la tabla para los resultados -->
+    <section class="table-section">
       <table>
-          <thead>
-            <tr>  
-              <th>ID</th>
-              <th>PIECEMARCK</th>
-              <th>BARCODE</th>
-              <th>ESP</th>
-              <th>PROFILE</th>
-              <th>LINEA</th>
-              <th>DESCRIPTION</th>
-              <th>CLASS</th>
-              <th>QUANTITY</th>
-              <th>WEIGHT</th>
-              <th>RATIO</th>
-              <th>TRASLADO</th>
-              <th>PRE_ENSAMBLE</th>
-              <th>MONTAJE</th>
-              <th>TORQUE</th>
-              <th>PUNCH</th>
-  
-              <!-- Añade más encabezados de columna según tus datos -->
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in filtered_data %}
-            <tr>
-              <td>{{ item.ID }}</td> <!-- ID -->
-              <td>{{ item.PIECEMARK }}</td> <!-- Warehouse -->
-              <td>{{ item.BARCODE }}</td> <!-- Description -->
-              <td>{{ item.ESP }}</td> <!-- Quantity -->
-              <td>{{ item.PROFILE }}</td> <!-- Weight -->
-              <td>{{ item.LINEA }}</td> <!-- Area -->
-              <td>{{ item.DESCRIPTION }}</td> <!-- Sector -->
-              <td>{{ item.CLASS }}</td> <!-- Type F -->
-              <td>{{ item.QUANTITY }}</td> <!-- Rate -->
-              <td>{{ item.WEIGHT }}</td> <!-- Reception Date -->
-              <td>{{ item.RATIO }}</td> <!-- Pre-Assembly Date -->
-              <td>{{ item.TRASLADO }}</td> <!-- Assembly Date -->
-              <td>{{ item.PRE_ENSAMBLE }}</td> <!-- Alignment Date -->
-              <td>{{ item.MONTAJE }}</td> <!-- Torque Date -->
-              <td>{{ item.TORQUE }}</td> <!-- Touch -->
-              <td>{{ item.PUNCH }}</td> <!-- Punch -->
-              <!-- Repite para cada columna adicional según sea necesario -->
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="16">No se encontraron resultados.</td>
-            </tr>
-            {% endfor %}
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>PIECEMARCK</th>
+            <th>BARCODE</th>
+            <th>ESP</th>
+            <th>PROFILE</th>
+            <th>LINEA</th>
+            <th>DESCRIPTION</th>
+            <th>CLASS</th>
+            <th>QUANTITY</th>
+            <th>WEIGHT</th>
+            <th>RATIO</th>
+            <th>TRASLADO</th>
+            <th>PRE_ENSAMBLE</th>
+            <th>MONTAJE</th>
+            <th>TORQUE</th>
+            <th>PUNCH</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- El contenido se llenará dinámicamente con JavaScript -->
         </tbody>
-        
-        </table>
-  </section>
-</div>
+      </table>
+    </section>
+  </div>
+
+  <!-- Script para la búsqueda y actualización de la tabla -->
+  <script>
+  function buscarElementos() {
+      // Crea el objeto FormData con los datos del formulario
+      const datosFormulario = new FormData(document.getElementById('searchForm'));
+
+      // Realiza la solicitud AJAX a `/search_elements`
+      fetch('/search_elements', {
+          method: 'POST',
+          body: datosFormulario
+      })
+      .then(response => response.json())  // Analiza la respuesta JSON
+      .then(data => {
+          // Verifica si hay un error en los datos
+          if (data.error) {
+              alert(data.error);
+          } else {
+              // Rellena la tabla con los datos filtrados
+              const tableBody = document.getElementById('tableBody');
+              tableBody.innerHTML = '';
+
+              if (data.data.length === 0) {
+                  // Muestra un mensaje si no hay resultados
+                  const row = document.createElement('tr');
+                  row.innerHTML = '<td colspan="16">No se encontraron resultados.</td>';
+                  tableBody.appendChild(row);
+              } else {
+                  // Llena la tabla con los resultados
+                  data.data.forEach(item => {
+                      const row = document.createElement('tr');
+                      row.innerHTML = `
+                          <td>${item.ID}</td>
+                          <td>${item.PIECEMARCK}</td>
+                          <td>${item.BARCODE}</td>
+                          <td>${item.ESP}</td>
+                          <td>${item.PROFILE}</td>
+                          <td>${item.LINEA}</td>
+                          <td>${item.DESCRIPTION}</td>
+                          <td>${item.CLASS}</td>
+                          <td>${item.QUANTITY}</td>
+                          <td>${item.WEIGHT}</td>
+                          <td>${item.RATIO}</td>
+                          <td>${item.TRASLADO}</td>
+                          <td>${item.PRE_ENSAMBLE}</td>
+                          <td>${item.MONTAJE}</td>
+                          <td>${item.TORQUE}</td>
+                          <td>${item.PUNCH}</td>
+                      `;
+                      tableBody.appendChild(row);
+                  });
+              }
+          }
+      })
+      .catch(error => {
+          alert('Ocurrió un error: ' + error.message);
+      });
+  }
+  </script>
+</body>
+</html>
