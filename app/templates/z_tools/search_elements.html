@@ -61,6 +61,7 @@
 
         <p></p>
         <button class="btn" type="button" onclick="buscarElementos()">Buscar</button>
+        <button class="btn" type="button" onclick="resetearFiltros()">Restablecer</button> <!-- Botón de Reinicio -->
       </form>
     </section>
 
@@ -96,6 +97,19 @@
 
   <!-- Script para la búsqueda y actualización de la tabla -->
   <script>
+
+function buscarElementos() {
+      // Código de búsqueda por AJAX
+  }
+
+  // Función para reiniciar los filtros a sus valores predeterminados
+  function resetearFiltros() {
+      // Obtén el formulario por su ID
+      const formulario = document.getElementById('searchForm');
+
+      // Restablece todos los valores a su predeterminado
+      formulario.reset();
+  }
   function buscarElementos() {
       // Crea el objeto FormData con los datos del formulario
       const datosFormulario = new FormData(document.getElementById('searchForm'));
@@ -126,7 +140,7 @@
                       const row = document.createElement('tr');
                       row.innerHTML = `
                           <td>${item.ID}</td>
-                          <td>${item.PIECEMARCK}</td>
+                          <td>${item.PIECEMARK}</td>
                           <td>${item.BARCODE}</td>
                           <td>${item.ESP}</td>
                           <td>${item.PROFILE}</td>
