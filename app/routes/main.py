@@ -1,9 +1,10 @@
 from app import app
-from ..services.sql_processor import Consultas_sql
-from ..services.excel_processor import DataExcel
-from ..services.graphic_processor import BokehGraph
-from flask import render_template, request, session, redirect, url_for, flash,send_file
+from app.services.sql_processor import Consultas_sql
+from app.services.excel_processor import DataExcel
+from app.services.graphic_processor import BokehGraph
+from flask import request, session, redirect, url_for, flash,send_file
 from sqlalchemy.exc import SQLAlchemyError
+from app.models.user import render_by_role
 
 
 @app.route('/download_excel')
@@ -68,5 +69,6 @@ def search_elements():
         except ValueError as e:
             flash(f"Error en el formato del ID: {e}", 'error')
 
-    return render_template('management/index.html', 
-                       filtered_data=filtered_data)
+    # Usa la función `render_by_role` para devolver la plantilla según el rol
+    context = {'filtered_data': filtered_data}
+    return render_by_role('index', context)
