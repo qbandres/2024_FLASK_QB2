@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {%include 'z_tools/header_anexo.html'%}
+       
+    <div id="ListContainer"></div>
+
+    <h3>Listado para editar</h3>
+    <form id="searchForm">
+        <input type="text" id="piecemarkFilter" name="search_filter" placeholder="Buscar por PIECEMARK">
+        <button class="btn" type="submit">Buscar</button>
+    </form>
+
+    <table id="searchResultsTable" class="bordered-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>PIECEMARK</th>
+                <th>ESP</th>
+                <th>LINEA</th>
+                <th>CLASS</th>
+                <th>QTY</th>
+                <th>WEIGHT</th>
+                <th>RATIO</th>
+                <th>TRASLADO</th>
+                <th>PRE_ENSAMBLE</th>
+                <th>MONTAJE</th>
+                <th>TORQUE</th>
+                <th>PUNCH</th>
+                <th>ACCIÓN</th>
+            </tr>
+        </thead>
+        <tbody id="searchResults"></tbody>
+    </table>
+
+    <div id="editListContainer">
+        <h3>Listado de items editados</h3>
+        <table id="editListTable" class="bordered-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>PIECEMARK</th>
+                    <th>ESP</th>
+                    <th>LINEA</th>
+                    <th>CLASS</th>
+                    <th>QTY</th>
+                    <th>WEIGHT</th>
+                    <th>RATIO</th>
+                    <th>TRASLADO</th>
+                    <th>PRE_ENSAMBLE</th>
+                    <th>MONTAJE</th>
+                    <th>TORQUE</th>
+                    <th>PUNCH</th>
+                    <th>ACCION</th>
+                </tr>
+            </thead>
+            <tbody id="editList"></tbody>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Crear un conjunto para almacenar las identificaciones de las filas que han sido editadas
+            var editListSet = new Set();
+
+            // Función para formatear fechas al formato "mm/dd/yyyy"
+            function formatDate(dateStr) {
+                if (!dateStr || dateStr === 'mm/dd/yyyy') return ''; // Valor predeterminado si no hay datos
+
+                const date = new Date(dateStr);
+                const year = date.getUTCFullYear();
+                const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+                const day = String(date.getUTCDate()).padStart(2, "0");
+
+                return isNaN(date.getTime()) ? '' : `${year}-${month}-${day}`; // Devuelve la fecha en el formato correcto
+                        }
+
+            // Función para llenar la tabla con los resultados filtrados
+            function fillTable(data) {
+                $('#searchResults').empty();
+                data.search_results.forEach(function (row) {
+                    const traslado = formatDate(row.traslado);
+                    const pre_ensamble = formatDate(row.pre_ensamble);
+                    const montaje = formatDate(row.montaje);
+                    const torque = formatDate(row.torque);
+                    const punch = formatDate(row.punch);
+
+                    const rowHtml =
+                        `<tr data-id="${row.id}">
+                            <td>${row.id}</td>
+                            <td>${row.piecemark}</td>
+                            <td>${row.esp}</td>
+                            <td>${row.linea}</td>
+                            <td>${row.class}</td>
+                            <td>${row.qty}</td>
+                            <td>${row.weight}</td>
+                            <td>${row.ratio}</td>
+                            <td><input type="date" class="traslado-input" value="${traslado}"></td>
+                            <td><input type="date" class="pre_ensamble-input" value="${pre_ensamble}"></td>
+                            <td><input type="date" class="montaje-input" value="${montaje}"></td>
+                            <td><input type="date" class="torque-input" value="${torque}"></td>
+                            <td><input type="date" class="punch-input" value="${punch}"></td>
+                            <td><button class="modify-btn" disabled>Modificar</button></td>
+                        </tr>`;
+                    $('#searchResults').append(rowHtml);
+                });
+            }
+
+            // Escuchar el evento 'change' para habilitar el botón de modificar
+            $('#searchResults').on('change', 'input', function () {
+                $(this).closest('tr').find('.modify-btn').prop('disabled', false);
+            });
+
+            // Evento para modificar una fila
+            $('#searchResults').on('click', '.modify-btn', function () {
+                const row = $(this).closest('tr');
+                const dataToUpdate = {
+                    id: row.data('id'),
+                    traslado: row.find('.traslado-input').val() || null,
+                    pre_ensamble: row.find('.pre_ensamble-input').val() || null,
+                    montaje: row.find('.montaje-input').val() || null,
+                    torque: row.find('.torque-input').val() || null,
+                    punch: row.find('.punch-input').val() || null
+                };
+
+                // Realizar la actualización vía POST
+                $.post('/actualizar_montaje', dataToUpdate, function (response) {
+                    if (response.success) {
+                        // Clonar la fila y cambiar los inputs por texto
+                        const clonedRow = row.clone();
+                        clonedRow.find('input').each(function () {
+                            const value = $(this).val();
+                            $(this).replaceWith(value);
+                        });
+
+                        // Reemplazar el botón de modificar por uno de eliminar
+                        const deleteButton = `<button class="remove-row" data-id="${clonedRow.data('id')}">Eliminar</button>`;
+                        clonedRow.find('.modify-btn').replaceWith(deleteButton);
+
+                        // Añadir o actualizar la fila en la lista de editados
+                        if (editListSet.has(dataToUpdate.id)) {
+                            $('#editList').find(`tr[data-id="${dataToUpdate.id}"]`).replaceWith(clonedRow);
+                        } else {
+                            $('#editList').append(clonedRow);
+                            editListSet.add(dataToUpdate.id);
+                        }
+
+                        // Mostrar el contenedor de la lista de editados
+                        $('#editListContainer').show();
+                    } else {
+                        alert("Error al actualizar el item.");
+                    }
+                });
+            });
+
+            // Evento para eliminar una fila de la lista de editados
+            $('#editList').on('click', '.remove-row', function () {
+                const rowId = $(this).data('id');
+                editListSet.delete(rowId);
+                $(this).closest('tr').remove();
+            });
+
+            // Evento para procesar el formulario de búsqueda
+            $('#searchForm').submit(function (event) {
+                event.preventDefault();
+                const filter = $('#piecemarkFilter').val();
+                $.post('/procesar_busqueda_actualizar', { search_filter: filter }, function (data) {
+                    $('#searchResultsTable').show();
+                    fillTable(data);
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

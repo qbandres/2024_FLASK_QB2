@@ -1,7 +1,8 @@
 from flask import session, render_template
 from app import app
 from app.utilities.decorators import requiere_rol
-from .main import generate_graph_data
+from app.routes.main import generate_graph_data
+from app.services.search_elements import search_elements
 
 
 search_main_table=None

@@ -21,6 +21,6 @@ db = SQLAlchemy(app)
 #Importaciones de tus rutas, utilidades y modelos
 from app.routes import login, index,main
 from app.models import user,db_function
-from app.services import sql_processor,excel_processor,graphic_processor
+from app.services import sql_processor,excel_processor,graphic_processor,update_assembly
 
 # Aquí se agregarían más configuraciones o inicializaciones si fuesen necesarias

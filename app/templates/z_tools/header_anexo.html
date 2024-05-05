@@ -11,16 +11,11 @@
                 </div>
             </div>
 
-            <div class="dropdown-container">
-                <button class="dropbtn">Opción 2</button>
-                <div class="dropdown-content">
-                    <a href="#">Link 3</a>
-                    <a href="#">Link 4</a>
-                </div>
-            </div>
-
             <a class="btn">Añadir Items</a>
-            <a class="btn" href="{{ url_for('update_assembly') }}">Actualizar montaje</a>
+            <!-- Botón para volver a /main -->
+            <a href="{{ url_for('redirigir_principal') }}">
+            <button class="btn">Principal</button>
+            </a>
             <!-- Agregar botón de salir -->
             <a class="btn" href="/login">Salir</a>
         </div>
