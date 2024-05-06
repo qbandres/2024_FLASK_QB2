@@ -43,10 +43,12 @@ class BokehGraph:
         hover = HoverTool()
         hover.tooltips = [
             ('Fecha de Montaje', "@x{%F}"),
-            ('Peso','@y{0,0}')
+            ('Peso','@y0{0,0}')
         ]
         hover.formatters = {'@x': 'datetime'}
         p.add_tools(hover)
+
+        print(source.data)
 
         # Devolver el script y el div
         script, div = components(p)
