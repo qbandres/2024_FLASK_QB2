@@ -2,22 +2,9 @@
 <div class="header-common">
     <header>
         <h1>DahsBoard - Constructor</h1>
-        <div class="dropdowns-container">
-            <div class="dropdown-container">
-                <button class="dropbtn">Resultados</button>
-                <div class="dropdown-content">
-                    <a >dash</a>
-                    <a >PF</a>
-                </div>
-            </div>
-
-            <a class="btn">Añadir Items</a>
-            <!-- Botón para volver a /main -->
-            <a href="{{ url_for('redirigir_principal') }}">
-            <button class="btn">Principal</button>
-            </a>
-            <!-- Agregar botón de salir -->
-            <a class="btn" href="/login">Salir</a>
+        <div class="dropdowns-container">      
+            <a class="btn btn-primary" href="{{ url_for('redirigir_principal') }}">Principal</a> <!-- Botón para volver a /main -->                           
+            <a class="btn btn-primary" href="/login">Salir</a> <!-- Agregar botón de salir -->
         </div>
     </header>
     <!-- Elementos del encabezado aquí -->

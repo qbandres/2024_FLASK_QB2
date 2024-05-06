@@ -10,12 +10,14 @@ def anadir_elemento():
         IDs = request.form.getlist('ID[]')
         PIECEMARKs = request.form.getlist('PIECEMARK[]')
         ESPs = request.form.getlist('ESP[]')
+        PROFILEs = request.form.getlist('PROFILE[]')
         LINEAs = request.form.getlist('LINEA[]')
+        DESCRIPTIONs =  request.form.getlist('DESCRIPTION[]')
         CLASSes = request.form.getlist('CLASS[]')
         QTYs = request.form.getlist('QTY[]')
         WEIGHTs = request.form.getlist('WEIGHT[]')
         RATIOs = request.form.getlist('RATIO[]')
-        ZONAs = request.form.getlist('ZONA[]')
+
 
         # Intentar insertar cada nuevo elemento en la base de datos
         try:
@@ -24,12 +26,13 @@ def anadir_elemento():
                     ID=IDs[i],
                     PIECEMARK=PIECEMARKs[i],
                     ESP=ESPs[i],
+                    PROFILE=PROFILEs[i],
                     LINEA=LINEAs[i],
+                    DESCRIPTION = DESCRIPTIONs[i],
                     CLASS=CLASSes[i],
                     QUANTITY=QTYs[i],
                     WEIGHT=WEIGHTs[i],
                     RATIO=RATIOs[i],
-                    ZONA=ZONAs[i],
                     TRASLADO=None,
                     PRE_ENSAMBLE=None,
                     MONTAJE=None,
@@ -44,7 +47,9 @@ def anadir_elemento():
             db.session.rollback()  # Revertir la transacción si ocurre un error
             flash('Error al añadir los elementos.', 'error')
 
-        return redirect(url_for('main'))
+        # Usa la función `render_by_role` para devolver la plantilla según el rol
+        context = {}
+        return render_by_role('index', context)
 
     # Si el método es GET, renderiza el formulario de añadir elemento
     return render_template('z_tools/add_items.html')

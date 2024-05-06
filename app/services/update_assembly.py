@@ -2,6 +2,7 @@ from app import app, db
 from flask import render_template, request, session, redirect, url_for, jsonify
 from app.models.db_function import EstTeklaData
 from datetime import datetime
+from app.models.user import render_by_role
 
 @app.route('/update_assembly')
 def update_assembly():
@@ -40,7 +41,9 @@ def actualizar_montaje():
         else:
             return jsonify({"success": False, "message": "Elemento no encontrado"}), 404
     else:
-        return redirect(url_for('index'))
+        # Usa la función `render_by_role` para devolver la plantilla según el rol
+        context = {}
+        return render_by_role('index', context)
 
 @app.route('/procesar_busqueda_actualizar', methods=['POST'])
 def handle_procesar_busqueda_actualizar():

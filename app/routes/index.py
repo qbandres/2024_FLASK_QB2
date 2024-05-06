@@ -3,6 +3,7 @@ from app import app
 from app.utilities.decorators import requiere_rol
 from app.routes.main import generate_graph_data
 from app.services.search_elements import search_elements
+from app.services.search_users import search_users
 
 
 search_main_table=None

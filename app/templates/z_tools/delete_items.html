@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar Elementos</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- Se inserta la barra de navegación estandar -->
+    {%include 'z_tools/header_anexo.html'%}  
+
+    <h3>Listado para eliminar</h3>
+    <form id="searchForm">
+        <input type="text" id="piecemarkFilter" name="search_filter" placeholder="Buscar por PIECEMARK">
+        <button class="btn" type="submit">Buscar</button>
+    </form>
+
+    <table id="searchResultsTable" class="bordered-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>PIECEMARK</th>
+                <th>ESP</th>
+                <th>LINEA</th>
+                <th>CLASS</th>
+                <th>QTY</th>
+                <th>WEIGHT</th>
+                <th>RATIO</th>
+                <th>ACCIÓN</th>
+            </tr>
+        </thead>
+        <tbody id="searchResults"></tbody>
+    </table>
+
+    <h3>Listado de elementos eliminados</h3>
+    <table id="deletedItemsTable" class="bordered-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>PIECEMARK</th>
+                <th>ESP</th>
+                <th>LINEA</th>
+                <th>CLASS</th>
+                <th>QTY</th>
+                <th>WEIGHT</th>
+                <th>RATIO</th>
+            </tr>
+        </thead>
+        <tbody id="deletedItems"></tbody>
+    </table>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Función para llenar la tabla con los resultados filtrados
+            function fillTable(data) {
+                $('#searchResults').empty();
+                data.search_results.forEach(function (row) {
+                    const rowHtml = `
+                        <tr data-id="${row.id}">
+                            <td>${row.id}</td>
+                            <td>${row.piecemark}</td>
+                            <td>${row.esp}</td>
+                            <td>${row.linea}</td>
+                            <td>${row.class}</td>
+                            <td>${row.qty}</td>
+                            <td>${row.weight}</td>
+                            <td>${row.ratio}</td>
+                            <td><button class="delete-btn">Eliminar</button></td>
+                        </tr>`;
+                    $('#searchResults').append(rowHtml);
+                });
+            }
+
+            // Función para agregar un elemento eliminado a la tabla de elementos eliminados
+            function addDeletedItem(row) {
+                const rowHtml = `
+                    <tr>
+                        <td>${row.find('td:nth-child(1)').text()}</td>
+                        <td>${row.find('td:nth-child(2)').text()}</td>
+                        <td>${row.find('td:nth-child(3)').text()}</td>
+                        <td>${row.find('td:nth-child(4)').text()}</td>
+                        <td>${row.find('td:nth-child(5)').text()}</td>
+                        <td>${row.find('td:nth-child(6)').text()}</td>
+                        <td>${row.find('td:nth-child(7)').text()}</td>
+                        <td>${row.find('td:nth-child(8)').text()}</td>
+                    </tr>`;
+                $('#deletedItems').append(rowHtml);
+            }
+
+            // Evento para buscar elementos a eliminar
+            $('#searchForm').submit(function (event) {
+                event.preventDefault();
+                const filter = $('#piecemarkFilter').val();
+                $.post('/procesar_busqueda_eliminar', { search_filter: filter }, function (data) {
+                    $('#searchResultsTable').show();
+                    fillTable(data);
+                });
+            });
+
+            // Evento para eliminar un elemento
+            $('#searchResults').on('click', '.delete-btn', function () {
+                const row = $(this).closest('tr');
+                const dataToDelete = {
+                    id: row.data('id')
+                };
+
+                $.post('/eliminar_elemento', dataToDelete, function (response) {
+                    if (response.success) {
+                        addDeletedItem(row); // Añade la fila a la tabla de elementos eliminados
+                        row.remove();        // Elimina la fila de la tabla original
+                        alert('Elemento eliminado con éxito.');
+                    } else {
+                        alert('Error al eliminar el elemento.');
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

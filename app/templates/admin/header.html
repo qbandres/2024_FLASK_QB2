@@ -3,26 +3,7 @@
     <header>
         <h1>DahsBoard - Admin</h1>
         <div class="dropdowns-container">
-            <div class="dropdown-container">
-                <button class="dropbtn">Resultados</button>
-                <div class="dropdown-content">
-                    <a >dash</a>
-                    <a >PF</a>
-                </div>
-            </div>
-
-            <div class="dropdown-container">
-                <button class="dropbtn">Opción 2</button>
-                <div class="dropdown-content">
-                    <a href="#">Descargar filtros</a>
-                    <a href="{{ url_for('download_excel') }}" class="btn btn-primary">Descargar información</a>
-                </div>
-            </div>
-
-            <a class="btn">Añadir Items</a>
-            <a class="btn">Actualizar montaje</a>
-            <!-- Agregar botón de salir -->
-            <a class="btn" href="/login" class="btn">Salir</a>
+            <a class="btn btn-primary" href="/login">Salir</a> <!-- Agregar botón de salir -->
         </div>
     </header>
     <!-- Elementos del encabezado aquí -->

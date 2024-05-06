@@ -18,11 +18,9 @@
                     <a href="#">Link 4</a>
                 </div>
             </div>
-
-            <a class="btn" href="{{ url_for('anadir_elemento') }}">Actualizar montaje</a>
-            <a class="btn" href="{{ url_for('update_assembly') }}">Actualizar montaje</a>
-            <!-- Agregar botón de salir -->
-            <a class="btn" href="/login">Salir</a>
+            <a class="btn btn-primary" href="{{ url_for('update_assembly') }}">Actualizar Montaje</a>
+            <a class="btn btn-primary" href="{{ url_for('download_excel') }}">Descargar plantilla</a>
+            <a class="btn btn-primary" href="/login">Salir</a> <!-- Agregar botón de salir -->
         </div>
     </header>
     <!-- Elementos del encabezado aquí -->

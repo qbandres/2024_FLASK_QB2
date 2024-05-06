@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <title>Búsqueda de Usuarios</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h3>Búsqueda de usuarios</h3>
+  <form id="searchForm">
+    <input type="text" id="usernameFilter" name="username_filter" placeholder="Nombre de usuario">
+    <input type="text" id="emailFilter" name="email_filter" placeholder="Correo electrónico">
+    <select id="roleFilter" name="role_filter">
+      <option value="">Selecciona un Rol</option>
+      <option value="admin">admin</option>
+      <option value="ot">ot</option>
+      <option value="site">site</option>
+      <option value="management">management</option>
+    </select>
+    <button type="button" onclick="buscarUsuarios()">Buscar</button>
+    <button type="button" onclick="resetearFiltros()">Restablecer</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre de usuario</th>
+        <th>Correo</th>
+        <th>Rol</th>
+        <th>Password</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+    </tbody>
+  </table>
+
+  <script>
+  function buscarUsuarios() {
+    const datosFormulario = new FormData(document.getElementById('searchForm'));
+
+    fetch('/search_users', {
+      method: 'POST',
+      body: datosFormulario
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert(data.error);
+      } else {
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = '';
+
+        if (data.data.length === 0) {
+          const row = document.createElement('tr');
+          row.innerHTML = '<td colspan="6">No se encontraron resultados.</td>';
+          tableBody.appendChild(row);
+        } else {
+          data.data.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${user.id}</td>
+              <td>${user.username}</td>
+              <td>${user.email}</td>
+              <td>${user.rol}</td>
+              <td id="password-${user.id}">****</td>
+              <td><button type="button" onclick="verCredenciales(${user.id})">Ver Credenciales</button></td>
+            `;
+            tableBody.appendChild(row);
+          });
+        }
+      }
+    })
+    .catch(error => {
+      alert('Ocurrió un error: ' + error.message);
+    });
+  }
+
+  function verCredenciales(userId) {
+    fetch('/get_password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ id: userId })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert(data.error);
+      } else {
+        const passwordCell = document.getElementById(`password-${userId}`);
+        passwordCell.innerText = data.password;
+      }
+    })
+    .catch(error => {
+      alert('Ocurrió un error al obtener las credenciales: ' + error.message);
+    });
+  }
+
+  function resetearFiltros() {
+    document.getElementById('searchForm').reset();
+  }
+  </script>
+</body>
+</html>

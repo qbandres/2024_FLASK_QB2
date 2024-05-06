@@ -20,14 +20,18 @@ h1 {
 
 /* Contenedor para menús desplegables, usando Flexbox para la alineación */
 .dropdowns-container {
+    background-color: #0b2d5b; /* Fondo oscuro para botones */
     display: flex; /* Flexbox para alinear desplegables horizontalmente */
     align-items: center; /* Centra verticalmente los desplegables */
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* animaciones suaves */
 }
 
 /* Estilo para el contenedor de cada menú desplegable */
 .dropdown-container {
     position: relative; /* Posicionamiento relativo para el posicionamiento absoluto del contenido desplegable */
     display: inline-block; /* Permite que los desplegables se ubiquen en línea con otros elementos */
+    background-color: #0b2d5b; /* Fondo oscuro para botones */
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* animaciones suaves */
 }
 
 /* Estilo genérico para botones desplegables y opciones */
@@ -60,7 +64,11 @@ h1 {
 }
 
 /* Estilo para enlaces desplegables al pasar el ratón */
-.dropdown-content a:hover {background-color: #f1f1f1;}
+.dropdown-content a:hover {background-color: #f1f1f1;
+    background-color: #1a4a8f; /* un azul ligeramente más claro para el efecto hover */
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2); /* añade una sombra para resaltar */
+    /* transform: scale(1.05); #hace el botón un poco más grande al pasar el cursor */
+}
 
 /* Muestra el contenido desplegable cuando se pasa el ratón sobre el contenedor */
 .dropdown-container:hover .dropdown-content {

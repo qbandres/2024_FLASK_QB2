@@ -6,12 +6,8 @@
 </head>
 <body>
 
-    <!-- Botón para volver a /main -->
-    <div style="position: absolute; top: 10px; right: 10px;">
-        <a href="/main">    
-            <button class="btn">Principal</button>
-        </a>
-    </div>
+    <!-- Se inserta la barra de navegación estandar -->
+    {%include 'z_tools/header_anexo.html'%}  
 
     <div class="container">
         <h2>Añadir Nuevo Elemento</h2>
@@ -20,10 +16,12 @@
                 <input type="number" placeholder="ID" name="ID[]">
                 <input type="text" placeholder="PIECEMARK" name="PIECEMARK[]" maxlength="15">
                 <input type="text" placeholder="ESP" name="ESP[]" maxlength="12">
+                <input type="text" placeholder="PROFILE" name="PROFILE[]" maxlength="12">
                 <select name="LINEA[]">
                     <option value="L1">L1</option>
                     <option value="L2">L2</option>
                 </select>
+                <input type="text" placeholder="DESCRIPTION" name="DESCRIPTION[]" maxlength="30">
                 <select name="CLASS[]">
                     <option value="Extra Pesada">Extra Pesada</option>
                     <option value="Pesada">Pesada</option>
@@ -54,10 +52,12 @@
                     <input type="number" placeholder="ID" name="ID[]">
                     <input type="text" placeholder="PIECEMARK" name="PIECEMARK[]" maxlength="15">
                     <input type="text" placeholder="ESP" name="ESP[]" maxlength="12">
+                    <input type="text" placeholder="PROFILE" name="PROFILE[]" maxlength="12">
                     <select name="LINEA[]">
                         <option value="L1">L1</option>
                         <option value="L2">L2</option>
                     </select>
+                    <input type="text" placeholder="DESCRIPTION" name="DESCRIPTION[]" maxlength="30">
                     <select name="CLASS[]">
                         <option value="Extra Pesada">Extra Pesada</option>
                         <option value="Pesada">Pesada</option>
