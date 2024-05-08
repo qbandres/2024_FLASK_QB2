@@ -29,11 +29,56 @@
         <th>Rol</th>
         <th>Password</th>
         <th>Acción</th>
+        <th>Editar</th>
+        <th>Eliminar</th>
       </tr>
     </thead>
     <tbody id="tableBody">
     </tbody>
   </table>
+
+  <!-- Formulario modal para agregar un nuevo usuario -->
+  <div id="addModal" style="display:none;">
+    <h4>Agregar Nuevo Usuario</h4>
+    <form id="addForm">
+      <label for="addUsername">Nombre de usuario:</label>
+      <input type="text" id="addUsername"><br>
+      <label for="addEmail">Correo:</label>
+      <input type="text" id="addEmail"><br>
+      <label for="addRol">Rol:</label>
+      <select id="addRol">
+        <option value="admin">admin</option>
+        <option value="ot">ot</option>
+        <option value="site">site</option>
+        <option value="management">management</option>
+      </select><br>
+      <label for="addPassword">Contraseña:</label>
+      <input type="password" id="addPassword"><br>
+      <button type="button" onclick="agregarUsuario()">Guardar</button>
+      <button type="button" onclick="cerrarAddModal()">Cancelar</button>
+    </form>
+  </div>
+
+  <!-- Botón para abrir el modal de agregar -->
+  <button type="button" onclick="mostrarAddModal()">Agregar Usuario</button>
+
+  <!-- Formulario modal para editar -->
+  <div id="editModal" style="display:none;">
+    <h4>Editar Usuario</h4>
+    <form id="editForm">
+      <input type="hidden" id="editId">
+      <label for="editUsername">Nombre de usuario:</label>
+      <input type="text" id="editUsername"><br>
+      <label for="editEmail">Correo:</label>
+      <input type="text" id="editEmail"><br>
+      <label for="editRol">Rol:</label>
+      <input type="text" id="editRol"><br>
+      <label for="editPassword">Nueva contraseña:</label>
+      <input type="password" id="editPassword" placeholder="Dejar en blanco para mantener la actual"><br>
+      <button type="button" onclick="actualizarUsuario()">Guardar</button>
+      <button type="button" onclick="cerrarEditModal()">Cancelar</button>
+    </form>
+  </div>
 
   <script>
   function buscarUsuarios() {
@@ -53,7 +98,7 @@
 
         if (data.data.length === 0) {
           const row = document.createElement('tr');
-          row.innerHTML = '<td colspan="6">No se encontraron resultados.</td>';
+          row.innerHTML = '<td colspan="8">No se encontraron resultados.</td>';
           tableBody.appendChild(row);
         } else {
           data.data.forEach(user => {
@@ -64,7 +109,9 @@
               <td>${user.email}</td>
               <td>${user.rol}</td>
               <td id="password-${user.id}">****</td>
-              <td><button type="button" onclick="verCredenciales(${user.id})">Ver Credenciales</button></td>
+              <td><button type="button" onclick="toggleCredenciales(${user.id})">Ver Credenciales</button></td>
+              <td><button type="button" onclick="mostrarEditModal(${user.id}, '${user.username}', '${user.email}', '${user.rol}')">Editar</button></td>
+              <td><button type="button" onclick="eliminarUsuario(${user.id})">Eliminar</button></td>
             `;
             tableBody.appendChild(row);
           });
@@ -76,29 +123,145 @@
     });
   }
 
-  function verCredenciales(userId) {
-    fetch('/get_password', {
+  function toggleCredenciales(userId) {
+    const passwordCell = document.getElementById(`password-${userId}`);
+
+    if (passwordCell.innerText === '****') {
+      fetch('/get_password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ id: userId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          passwordCell.innerText = data.password;
+        }
+      })
+      .catch(error => {
+        alert('Ocurrió un error al obtener las credenciales: ' + error.message);
+      });
+    } else {
+      passwordCell.innerText = '****';
+    }
+  }
+
+  function mostrarAddModal() {
+    // Limpiar todos los campos de entrada del formulario para agregar
+    document.getElementById('addUsername').value = '';
+    document.getElementById('addEmail').value = '';
+    document.getElementById('addRol').value = 'admin'; // Puedes ajustar el valor predeterminado aquí
+    document.getElementById('addPassword').value = '';
+
+    // Mostrar el modal para agregar
+    document.getElementById('addModal').style.display = 'block';
+  }
+
+
+  function cerrarAddModal() {
+    document.getElementById('addModal').style.display = 'none';
+  }
+
+  function agregarUsuario() {
+    const datosFormulario = new URLSearchParams({
+      username: document.getElementById('addUsername').value,
+      email: document.getElementById('addEmail').value,
+      rol: document.getElementById('addRol').value,
+      password: document.getElementById('addPassword').value
+    });
+
+    fetch('/add_user', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ id: userId })
+      body: datosFormulario
     })
     .then(response => response.json())
     .then(data => {
       if (data.error) {
         alert(data.error);
       } else {
-        const passwordCell = document.getElementById(`password-${userId}`);
-        passwordCell.innerText = data.password;
+        alert('Usuario agregado correctamente.');
+        cerrarAddModal();
+        buscarUsuarios();
       }
     })
     .catch(error => {
-      alert('Ocurrió un error al obtener las credenciales: ' + error.message);
+      alert('Ocurrió un error al agregar el usuario: ' + error.message);
     });
+  }
+
+  function mostrarEditModal(id, username, email, rol) {
+    document.getElementById('editId').value = id;
+    document.getElementById('editUsername').value = username;
+    document.getElementById('editEmail').value = email;
+    document.getElementById('editRol').value = rol;
+    document.getElementById('editModal').style.display = 'block';
+  }
+
+  function cerrarEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+  }
+
+  function actualizarUsuario() {
+    const datosFormulario = new URLSearchParams({
+      id: document.getElementById('editId').value,
+      username: document.getElementById('editUsername').value,
+      email: document.getElementById('editEmail').value,
+      rol: document.getElementById('editRol').value,
+      password: document.getElementById('editPassword').value
+    });
+
+    fetch('/update_user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: datosFormulario
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert(data.error);
+      } else {
+        alert('Usuario actualizado correctamente.');
+        cerrarEditModal();
+        buscarUsuarios();
+      }
+    })
+    .catch(error => {
+      alert('Ocurrió un error al actualizar el usuario: ' + error.message);
+    });
+  }
+
+  function eliminarUsuario(userId) {
+    if (confirm('¿Está seguro de que desea eliminar a este usuario?')) {
+      fetch('/delete_user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ id: userId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          alert('Usuario eliminado correctamente.');
+          buscarUsuarios();
+        }
+      })
+      .catch(error => {
+        alert('Ocurrió un error al eliminar el usuario: ' + error.message);
+      });
+    }
   }
 
   function resetearFiltros() {
     document.getElementById('searchForm').reset();
+    buscarUsuarios();
   }
+
+  // Cargar la lista de usuarios inicialmente
+  buscarUsuarios();
   </script>
 </body>
 </html>
