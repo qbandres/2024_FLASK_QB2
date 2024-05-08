@@ -16,6 +16,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Aquí irían las demás configuraciones y la inicialización de otros componentes de tu aplicación Flask
+# Imprimir valores de configuración
+print("SECRET_KEY:", app.config['SECRET_KEY'])
+print("SQLALCHEMY_DATABASE_URI:", app.config['SQLALCHEMY_DATABASE_URI'])
 
 
 #Importaciones de tus rutas, utilidades y modelos
