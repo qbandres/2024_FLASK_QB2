@@ -1,29 +1,38 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
+import boto3
 import os
 
-# Carga las variables de entorno del archivo .env
-load_dotenv()
+# Función para obtener parámetros de AWS Systems Manager Parameter Store
+def get_ssm_parameter(name):
+    ssm = boto3.client('ssm')
+    response = ssm.get_parameter(Name=name, WithDecryption=True)
+    return response['Parameter']['Value']
 
+# Inicializa tu aplicación Flask
 app = Flask(__name__)
 
-# Configura la clave secreta y la URI de la base de datos a partir de las variables de entorno
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+# Intenta encontrar el archivo .env
+if find_dotenv():
+    # Carga las variables desde el archivo .env
+    load_dotenv()
+    secret_key = os.getenv('SECRET_KEY')
+    sqlalchemy_uri = os.getenv('SQLALCHEMY_DATABASE_URI')
+else:
+    # Si no se encuentra el archivo .env, usa Parameter Store
+    secret_key = get_ssm_parameter('/myproject/prod/SECRET_KEY')
+    sqlalchemy_uri = get_ssm_parameter('/myproject/prod/SQLALCHEMY_DATABASE_URI')
+
+# Configura la aplicación con los valores obtenidos
+app.config['SECRET_KEY'] = secret_key
+app.config['SQLALCHEMY_DATABASE_URI'] = sqlalchemy_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Inicializa SQLAlchemy
 db = SQLAlchemy(app)
 
-# Aquí irían las demás configuraciones y la inicialización de otros componentes de tu aplicación Flask
-# Imprimir valores de configuración
-print("SECRET_KEY:", app.config['SECRET_KEY'])
-print("SQLALCHEMY_DATABASE_URI:", app.config['SQLALCHEMY_DATABASE_URI'])
-
-
-#Importaciones de tus rutas, utilidades y modelos
-from app.routes import login, index,main
-from app.models import user,db_function
-from app.services import sql_processor,excel_processor,graphic_processor,update_assembly,add_items,delete_items
-
-# Aquí se agregarían más configuraciones o inicializaciones si fuesen necesarias
+# Importa las rutas, modelos y servicios de tu aplicación
+from app.routes import login, index, main
+from app.models import user, db_function
+from app.services import sql_processor, excel_processor, graphic_processor, update_assembly, add_items, delete_items
